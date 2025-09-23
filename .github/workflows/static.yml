@@ -1,0 +1,78 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          
+      - name: Create Directory
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            mkdir -p /var/www/simple-crud
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "./*"
+          target: /var/www/simple-crud
+
+      - name: Setting apache2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            mysql -u root -e "create database db_crud; grant all privileges on db_crud.* to 'root'@'%'; flush privileges;"
+            mysql -u root db_crud < /var/www/simple-curd/db_crud.sql 
+            
+            echo '<VirtualHost *:200>
+              ServerName ideastea.destiaekaas.my.id
+              ServerAdmin webmaster@localhost
+              DocumentRoot /var/www/simple-crud
+              ErrorLog ${APACHE_LOG_DIR}/error.log
+              CustomLog ${APACHE_LOG_DIR}/access.log combined
+            </VirtualHost>' | sudo tee /etc/apache2/sites-available/crud.conf
+
+            ufw allow 200/tcp
+            ufw allow 200/udp
+            ufw reload
+            a2ensite crud.conf
+            systemctl restart apache2
