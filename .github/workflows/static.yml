@@ -63,7 +63,7 @@ jobs:
             mysql -u root -e "create database db_crud; grant all privileges on db_crud.* to 'root'@'%'; flush privileges;"
             mysql -u root db_crud < /var/www/simple-curd/db_crud.sql 
             
-            echo '<VirtualHost *:200>
+            echo '<VirtualHost *:300>
               ServerName ideastea.destiaekaas.my.id
               ServerAdmin webmaster@localhost
               DocumentRoot /var/www/simple-crud
@@ -71,8 +71,8 @@ jobs:
               CustomLog ${APACHE_LOG_DIR}/access.log combined
             </VirtualHost>' | sudo tee /etc/apache2/sites-available/crud.conf
 
-            ufw allow 200/tcp
-            ufw allow 200/udp
+            ufw allow 300/tcp
+            ufw allow 300/udp
             ufw reload
             a2ensite crud.conf
             systemctl restart apache2
