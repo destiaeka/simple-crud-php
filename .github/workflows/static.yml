@@ -38,7 +38,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
           script: |
             mkdir -p /var/www/simple-crud
 
@@ -48,7 +47,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
           source: "./*"
           target: /var/www/simple-crud
 
@@ -58,13 +56,11 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
           script: |
             mysql -u root -e "create database crud_db; create user 'crd'@'localhost' identified by '123'; grant all privileges on crud_db.* to 'crd'@'localhost' identified by '123'; flush privileges;"
             mysql -u crd -p'123' crud_db < /var/www/simple-curd/db_crud.sql 
             
             echo '<VirtualHost *:300>
-              ServerName ideastea.destiaekaas.my.id
               ServerAdmin webmaster@localhost
               DocumentRoot /var/www/simple-crud
               ErrorLog ${APACHE_LOG_DIR}/error.log
