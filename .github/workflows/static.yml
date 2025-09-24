@@ -61,7 +61,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             mysql -u root -e "create database crud_db; create user 'crd'@'localhost' identified by '123'; grant all privileges on crud_db.* to 'crd'@'localhost' identified by '123'; flush privileges;"
-            mysql -u crd -p'123' crud_db < /var/www/simple-curd/db_crud.sql 
+            mysql -u crd -p'123' crud_db < /var/www/simple-crud/db_crud.sql 
             
             echo '<VirtualHost *:300>
               ServerAdmin webmaster@localhost
