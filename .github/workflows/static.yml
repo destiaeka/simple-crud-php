@@ -61,7 +61,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             mysql -u root -e "create database crud_db; create user 'crd'@'localhost' identified by '123'; grant all privileges on crud_db.* to 'crd'@'localhost' identified by '123'; flush privileges;"
-            mysql -u root crud_db < /var/www/simple-curd/db_crud.sql 
+            mysql -u crd -p'123' crud_db < /var/www/simple-curd/db_crud.sql 
             
             echo '<VirtualHost *:300>
               ServerName ideastea.destiaekaas.my.id
@@ -74,5 +74,5 @@ jobs:
             ufw allow 300/tcp
             ufw allow 300/udp
             ufw reload
-            a2ensite crud.conf
+            a2ensite crud_db.conf
             systemctl restart apache2
