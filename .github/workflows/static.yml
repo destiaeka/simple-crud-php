@@ -60,8 +60,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            mysql -u root -e "create database db_crud; grant all privileges on db_crud.* to 'root'@'%'; flush privileges;"
-            mysql -u root db_crud < /var/www/simple-curd/db_crud.sql 
+            mysql -u root -e "create database crud_db; create user 'crd'@'localhost' identified by '123'; grant all privileges on crud_db.* to 'crd'@'localhost' identified by '123'; flush privileges;"
+            mysql -u root crud_db < /var/www/simple-curd/db_crud.sql 
             
             echo '<VirtualHost *:300>
               ServerName ideastea.destiaekaas.my.id
@@ -69,7 +69,7 @@ jobs:
               DocumentRoot /var/www/simple-crud
               ErrorLog ${APACHE_LOG_DIR}/error.log
               CustomLog ${APACHE_LOG_DIR}/access.log combined
-            </VirtualHost>' | sudo tee /etc/apache2/sites-available/crud.conf
+            </VirtualHost>' | sudo tee /etc/apache2/sites-available/crud_db.conf
 
             ufw allow 300/tcp
             ufw allow 300/udp
